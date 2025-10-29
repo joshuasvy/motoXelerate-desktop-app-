@@ -1,10 +1,10 @@
 {
-  "name": "capstone-desktop",
+  "name": "desktop-app-motoxelerate",
   "private": true,
   "version": "0.0.0",
   "main": "dist-electron/main.js",
   "scripts": {
-    "dev": "concurrently \"tsc -p tsconfig.node.json -w\" \"vite --port 5173 --strictPort\" \"wait-on http://localhost:5173 && electron .\"",
+    "start": "concurrently \"tsc -p tsconfig.node.json -w\" \"vite --port 5173 --strictPort\" \"wait-on http://localhost:5173 && electron .\"",
     "clean": "node -e \"['dist','dist-electron'].forEach(d=>{try{require('fs').rmSync(d,{recursive:true,force:true});}catch(e){}})\"",
     "build": "tsc -p tsconfig.node.json && vite build",
     "build:electron": "tsc -p tsconfig.node.json",
@@ -17,7 +17,8 @@
   },
   "dependencies": {
     "react": "^19.1.1",
-    "react-dom": "^19.1.1"
+    "react-dom": "^19.1.1",
+    "react-router-dom": "^7.9.4"
   },
   "devDependencies": {
     "@eslint/js": "^9.36.0",
@@ -28,6 +29,7 @@
     "autoprefixer": "^10.4.21",
     "concurrently": "^9.2.1",
     "electron": "^38.3.0",
+    "electron-builder": "^24.6.0",
     "eslint": "^9.36.0",
     "eslint-plugin-react-hooks": "^5.2.0",
     "eslint-plugin-react-refresh": "^0.4.22",
@@ -37,10 +39,8 @@
     "typescript": "~5.9.3",
     "typescript-eslint": "^8.45.0",
     "vite": "^7.1.7",
-    "wait-on": "^9.0.1",
-    "electron-builder": "^24.6.0"
-  }
-  ,
+    "wait-on": "^9.0.1"
+  },
   "build": {
     "appId": "com.example.capstone",
     "productName": "Capstone Desktop",
