@@ -39,7 +39,7 @@ export default function AppointmentModal({
       requestAnimationFrame(() => setAnimateIn(true));
       setMechanic(appointment.mechanic);
       setSchedule(new Date(appointment.date).toISOString().split("T")[0]);
-      setTime(appointment.time);
+      setTime(to24HourFormat(appointment.time));
       setFee(
         appointment.service_Charge ? appointment.service_Charge.toString() : ""
       );
@@ -105,6 +105,18 @@ export default function AppointmentModal({
       alert("❌ Failed to delete appointment.");
     }
   };
+
+  function to24HourFormat(timeString: string): string {
+    const [time, period] = timeString.trim().split(" ");
+    let [hour, minute] = time.split(":").map(Number);
+
+    if (period === "PM" && hour !== 12) hour += 12;
+    if (period === "AM" && hour === 12) hour = 0;
+
+    return `${hour.toString().padStart(2, "0")}:${minute
+      .toString()
+      .padStart(2, "0")}`;
+  }
 
   const handleSave = async () => {
     const token = localStorage.getItem("token");
@@ -226,10 +238,10 @@ export default function AppointmentModal({
               onChange={(e) => setStatus(e.target.value)}
               className="text-[15px] font-semibold text-black cursor-pointer bg-transparent border border-gray-500 rounded-md p-1"
             >
-              <option value="pending">Pending</option>
-              <option value="approved">Approved</option>
-              <option value="rejected">Rejected</option>
-              <option value="completed">Completed</option>
+              <option value="Pending">Pending</option>
+              <option value="Approved">Approved</option>
+              <option value="Rejected">Rejected</option>
+              <option value="Completed">Completed</option>
             </select>
           </div>
 

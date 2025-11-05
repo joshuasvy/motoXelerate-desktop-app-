@@ -35,13 +35,13 @@ export default function CustomerLogCard({ customers }: CustomerLogCardProps) {
         />
       </div>
 
-      <div className="flex flex-row flex-wrap gap-6 text-sm text-gray-600 font-medium mb-5">
-        <div className="min-w-[180px] mt-2">Customer ID</div>
-        <div className="min-w-[130px] mt-2">Name</div>
-        <div className="min-w-[150px] mt-2">Contact</div>
-        <div className="min-w-[180px] mt-2">Email</div>
-        <div className="min-w-[195px] mt-2">Address</div>
-        <div className="min-w-[160px] mt-2">Action</div>
+      <div className="flex flex-row flex-wrap gap-6 text-sm text-gray-600 font-medium mb-3 mt-2">
+        <div className="w-[180px] ">Customer ID</div>
+        <div className="w-[135px]  ">Name</div>
+        <div className="w-[150px]  ">Contact</div>
+        <div className="w-[180px]  ">Email</div>
+        <div className="w-[240px]  ">Address</div>
+        <div className="w-fit ml-2">Action</div>
       </div>
 
       {customers.map((customer) => (
@@ -49,26 +49,26 @@ export default function CustomerLogCard({ customers }: CustomerLogCardProps) {
           key={customer.id}
           className="flex flex-row flex-wrap gap-6 mb-3 text-sm"
         >
-          <div className="min-w-[180px] mt-2">
-            <p className="font-semibold">{customer.id}</p>
+          <div className="w-[180px]  ">
+            <p className="font-semibold truncate">{customer.id}</p>
           </div>
-          <div className="min-w-[130px] mt-2">
+          <div className="w-[135px]  truncate">
             <p className="font-semibold">{customer.name}</p>
           </div>
-          <div className="min-w-[150px] mt-2">
+          <div className="min-w-[150px] ">
             <p className="font-semibold">{customer.contact}</p>
           </div>
-          <div className="min-w-[180px] mt-2">
+          <div className="min-w-[180px] ">
             <p className="font-semibold truncate whitespace-nowrap overflow-hidden w-[160px]">
               {customer.email}
             </p>
           </div>
-          <div className="min-w-[195px] mt-2">
-            <p className="font-semibold truncate whitespace-nowrap overflow-hidden w-[160px]">
+          <div className="min-w-[195px] ">
+            <p className="font-semibold truncate whitespace-nowrap overflow-hidden w-[240px]">
               {customer.address}
             </p>
           </div>
-          <div className="min-w-[160px] mt-2">
+          <div className="w-fit  ml-2">
             <button
               onClick={() => handleEdit(customer)}
               className="font-semibold text-blue-700 hover:underline"

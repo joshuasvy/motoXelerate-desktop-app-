@@ -9,7 +9,7 @@ type AppointmentProps = {
     status: string;
     service_Charge?: number;
   };
-  onEdit: () => void; // ✅ new prop
+  onEdit: () => void
 };
 
 const statusColor: Record<string, string> = {

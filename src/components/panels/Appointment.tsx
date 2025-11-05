@@ -23,15 +23,15 @@ export default function Appointment() {
   };
 
   useEffect(() => {
-    fetchAppointments(); // initial fetch
+    fetchAppointments();
 
     const interval = setInterval(() => {
       if (!isModalOpen) {
-        fetchAppointments(); // ✅ only refresh if modal is closed
+        fetchAppointments();
       }
     }, 1000);
 
-    return () => clearInterval(interval); // cleanup
+    return () => clearInterval(interval);
   }, [isModalOpen]);
 
   useEffect(() => {

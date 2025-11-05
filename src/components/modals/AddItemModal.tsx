@@ -60,7 +60,7 @@ export default function AddItemModal({
 
       const formData = new FormData();
       formData.append("file", imageFile);
-      formData.append("upload_preset", "MotoXelerate-Product");
+      formData.append("upload_preset", "MotoXelerate");
 
       const uploadRes = await axios.post(
         "https://api.cloudinary.com/v1_1/dhh37ekzf/image/upload",
@@ -76,12 +76,12 @@ export default function AddItemModal({
       }
 
       const productData = {
-        product_Name: productName,
+        productName: productName,
         image: imageUrl,
-        product_Price: price,
-        stock,
-        category,
-        product_Specification: specification,
+        price: parseFloat(price.toString().replace(/,/g, "")),
+        stock: parseInt(stock.toString()),
+        category: category,
+        specification: specification,
       };
 
       if (!category) {

@@ -19,6 +19,7 @@ export default function SaveBtn({
 
   return (
     <button
+      type="button" // ✅ prevents accidental form submission
       onClick={onPress}
       className={`text-[16px] font-medium py-3 px-5 rounded-md shadow-sm flex justify-between items-center gap-3 ${bgColor} ${textColor}`}
     >

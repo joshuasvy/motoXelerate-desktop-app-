@@ -68,36 +68,36 @@ export default function CustomerModal({
                 </div>
                 <div className="flex justify-between px-11">
                   <div className="flex flex-col">
-                    <p className="text-[17px] font-medium whitespace-nowrap mb-2">
+                    <p className="text-md font-medium whitespace-nowrap mb-2">
                       Customer ID
                     </p>
-                    <p className="text-[17px] font-medium mb-2">Name</p>
-                    <p className="text-[17px] font-medium mb-2">Contact</p>
-                    <p className="text-[17px] font-medium mb-2">Email</p>
-                    <p className="text-[17px] font-medium mb-2">Address</p>
+                    <p className="text-md font-medium mb-2">Name</p>
+                    <p className="text-md font-medium mb-2">Contact</p>
+                    <p className="text-md font-medium mb-2">Email</p>
+                    <p className="text-md font-medium mb-2">Address</p>
                   </div>
                   <div className="flex flex-col">
-                    <p className="text-[17px] font-medium mb-2">
+                    <p className="text-md font-medium mb-2">
                       <span>
                         : <span>{customer.id}</span>
                       </span>
                     </p>
-                    <p className="text-[17px] font-medium mb-2">
+                    <p className="text-md font-medium mb-2">
                       <span>
                         : <span>{customer.name}</span>
                       </span>
                     </p>
-                    <p className="text-[17px] font-medium mb-2">
+                    <p className="text-md font-medium mb-2">
                       <span>
                         : <span>{customer.contact}</span>
                       </span>
                     </p>
-                    <p className="text-[17px] font-medium mb-2">
+                    <p className="text-md font-medium mb-2">
                       <span>
                         : <span>{customer.email}</span>
                       </span>
                     </p>
-                    <p className="text-[17px] font-medium whitespace-wrap w-[205px]">
+                    <p className="text-md font-medium whitespace-wrap w-[205px]">
                       <span>
                         : <span>{customer.address}</span>
                       </span>
@@ -117,7 +117,7 @@ export default function CustomerModal({
                     </div>
                     <div className="text-md min-w-[120px]">Status</div>
                   </div>
-                  <div className="flex flex-row flex-wrap gap-4 text-sm mt-2">
+                  <div className="flex flex-row flex-wrap gap-4 text-sm mt-4">
                     <div className="min-w-[130px]">
                       <p className="text-md font-semibold whitespace-nowrap truncate w-[100px]">
                         {customer.orderId}
@@ -148,36 +148,30 @@ export default function CustomerModal({
                 <div className="border-t-2 border-gray-700 mx-6 h-[270px]">
                   <div className="mt-4">
                     <div className="flex flex-row gap-4 text-sm text-gray-600 font-medium mb-3">
-                      <div className="text-md min-w-[130px]">Service ID</div>
-                      <div className="text-md min-w-[140px]">Service</div>
-                      <div className="text-md min-w-[140px]">Price</div>
-                      <div className="text-md line-clamp-2 min-w-[115px]">
+                      <div className="text-md w-[150px] ">Service</div>
+                      <div className="text-md w-[160px] ">Date</div>
+                      <div className="text-md w-[140px] ">Price</div>
+                      <div className="text-md w-[180px] ">
                         Payment Method
                       </div>
-                      <div className="text-md  min-w-[160px]">Date</div>
-                      <div className="text-md min-w-[120px]">Status</div>
+                      <div className="text-md w-fit ">Status</div>
                     </div>
 
-                    <div className="flex flex-row flex-wrap gap-4 text-sm mt-2">
-                      <div className="min-w-[130px]">
-                        <p className="text-md font-semibold whitespace-nowrap truncate w-[100px]">
-                          {customer.orderId}
-                        </p>
-                      </div>
-                      <div className="min-w-[140px]">
-                        <p className="text-md font-semibold whitespace-nowrap truncate w-[120px]">
+                    <div className="flex flex-row flex-wrap gap-4 text-sm mt-3">
+                      <div className="w-[150px]">
+                        <p className="text-md font-semibold whitespace-nowrap truncate ">
                           {customer.product}
                         </p>
                       </div>
-                      <div className="min-w-[140px]">
+                      <div className="w-[160px] ">
                         <p className="text-md font-semibold">{customer.date}</p>
                       </div>
-                      <div className="min-w-[115px]">
+                      <div className="w-[140px] ">
                         <p className="text-md font-semibold">
                           {customer.total}
                         </p>
                       </div>
-                      <div className="min-w-[160px]">
+                      <div className="w-[180px]">
                         <p className="text-md] font-semibold">
                           {customer.payment}
                         </p>
