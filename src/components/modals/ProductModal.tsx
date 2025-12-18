@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
-import SaveBtn from "../SaveBtn";
-// import StarRating from "../StarRating";
+import ActionBtn from "../ActionBtn";
 
 type Product = {
   image: string;
@@ -82,6 +81,28 @@ export default function ProductModal({
     }
   };
 
+  // 🗑️ Delete handler
+  const handleDelete = async () => {
+    if (!product) return;
+
+    if (!window.confirm(`Are you sure you want to delete "${product.name}"?`)) {
+      return;
+    }
+
+    try {
+      await axios.delete(
+        `https://api-motoxelerate.onrender.com/api/product/${product.id}`
+      );
+
+      console.log(`✅ Product ${product.id} deleted successfully`);
+      onClose();
+      onRefresh();
+    } catch (err) {
+      console.error("❌ Error deleting product:", err);
+      alert("Failed to delete product.");
+    }
+  };
+
   if (!isOpen || !product) return null;
 
   return (
@@ -96,12 +117,20 @@ export default function ProductModal({
 
         <h2 className="text-2xl font-semibold mb-6">{product.name}</h2>
         <div className="flex gap-8">
-          <img
-            src={product.image}
-            alt={product.name}
-            className="w-[300px] h-[300px] object-contain rounded border"
-          />
+          <div>
+            <img
+              src={product.image}
+              alt={product.name}
+              className="w-[370px] h-[300px] object-contain rounded"
+            />
+            <div className="flex justify-between mt-4">
+              <ActionBtn type="save" onPress={handleSave} />
+              <ActionBtn type="delete" onPress={handleDelete} />
+            </div>
+          </div>
+
           <div className="flex flex-col gap-4 w-[90%]">
+            {/* Inputs for editing product */}
             <div>
               <label className="block text-sm text-gray-600 mb-1">Name</label>
               <input
@@ -163,16 +192,7 @@ export default function ProductModal({
                 placeholder="Describe the product"
               />
             </div>
-
-            {/* <div>
-              <p className="block text-sm text-gray-600 mb-2">Reviews</p>
-              <StarRating rating={parseFloat(product.reviews)} size={16} />
-            </div> */}
           </div>
-        </div>
-
-        <div className="mt-6">
-          <SaveBtn icon="/images/icons/save.png" onPress={handleSave} />
         </div>
       </div>
     </div>

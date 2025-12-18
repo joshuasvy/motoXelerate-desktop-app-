@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import SaveBtn from "../SaveBtn";
+import ActionBtn from "../ActionBtn";
 import axios from "axios";
 
 type AppointmentModalProps = {
@@ -238,29 +238,27 @@ export default function AppointmentModal({
               onChange={(e) => setStatus(e.target.value)}
               className="text-[15px] font-semibold text-black cursor-pointer bg-transparent border border-gray-500 rounded-md p-1"
             >
-              <option value="Pending">Pending</option>
-              <option value="Approved">Approved</option>
-              <option value="Rejected">Rejected</option>
-              <option value="Completed">Completed</option>
+              {/* placeholder/ disabled */}
+              {status === "Pending" && (
+                <option value="Pending" disabled>
+                  Pending
+                </option>
+              )}
+
+              {/* selection */}
+              {["Approved", "Rejected", "Completed"].map((s) => (
+                <option key={s} value={s}>
+                  {s}
+                </option>
+              ))}
             </select>
           </div>
 
           <div className="flex flex-row justify-between items-center py-3">
             {admin?.role === "admin" && (
-              <SaveBtn
-                label="Delete"
-                onPress={handleDelete}
-                color="red"
-                icon="/images/icons/delete.png"
-              />
+              <ActionBtn type="save" onPress={handleSave} />
             )}
-
-            <SaveBtn
-              label="Save"
-              onPress={handleSave}
-              color="green"
-              icon="/images/icons/save.png"
-            />
+            <ActionBtn type="delete" onPress={handleDelete} />
           </div>
         </div>
       </div>

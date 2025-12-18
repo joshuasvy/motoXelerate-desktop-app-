@@ -12,7 +12,7 @@ export default function StatCard({
   children,
 }: StatCardProps) {
   return (
-    <div className="bg-white px-4 py-5 rounded-md shadow-lg">
+    <div className="bg-white px-4 py-5 rounded-md shadow-md">
       <div className="flex justify-between items-center">
         <h1 className="text-xl font-semibold">{title}</h1>
         <img src={icon} alt={title} className="w-8" />

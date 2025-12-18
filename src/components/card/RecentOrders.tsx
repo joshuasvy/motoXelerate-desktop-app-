@@ -1,137 +1,147 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useOrders } from "../../../hooks/useOrders";
+import type { Order } from "../../../hooks/useOrders";
 import RecentOrderModal from "../modals/RecentOrderModal";
-import axios from "axios";
-
-type OrderItem = {
-  productId: string;
-  productName: string | null;
-  price: string | null;
-  quantity: number;
-  status: string;
-};
-
-type Order = {
-  id: string;
-  name: string;
-  date: string;
-  quantity: number;
-  total: string;
-  payment: string;
-  status: string;
-  address: string;
-  items: OrderItem[];
-};
 
 type RecentOrdersProps = {
-  orders: Order[];
+  orders?: Order[];
+  filter: string;
+  onView: (order: Order) => void;
 };
 
-const formatOrder = (data: any): Order => ({
-  id: data.orderId || data._id,
-  name: data.customerName,
-  date: new Date(data.orderDate || data.createdAt).toLocaleDateString(),
-  quantity: data.items.reduce(
-    (sum: number, item: any) => sum + item.quantity,
-    0
-  ),
-  total: `₱${parseFloat(data.totalOrder).toLocaleString()}`,
-  payment: data.paymentMethod,
-  status: data.orderRequest || "N/A",
-  address: data.deliveryAddress || "No address provided",
-  items: data.items.map((item: any, index: number) => ({
-    productId: item.productId ?? `missing-${index}`,
-    productName: item.productName ?? null,
-    price:
-      item.price != null ? `₱${parseFloat(item.price).toLocaleString()}` : null,
-    quantity: item.quantity,
-    status: item.status,
-  })),
-});
-
-export default function RecentOrders({ orders }: RecentOrdersProps) {
+export default function RecentOrders({
+  orders = [],
+  filter,
+  onView,
+}: RecentOrdersProps) {
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [expanded, setExpanded] = useState(false); // ✅ local toggle
+
+  const { fetchOrderById } = useOrders();
+
+  const statusColor: Record<string, string> = {
+    "For Approval": "bg-yellow-100 text-yellow-700",
+    "To ship": "bg-blue-100 text-blue-700",
+    Ship: "bg-indigo-100 text-indigo-700",
+    Delivered: "bg-purple-100 text-purple-700",
+    Completed: "bg-green-200 text-green-700",
+    Cancelled: "bg-red-100 text-red-700",
+  };
+
+  const getOrderStatus = (order: Order): string => {
+    if (!order.items || order.items.length === 0) return "For Approval";
+    return order.items[order.items.length - 1].status ?? "For Approval";
+  };
+
+  const getStatusClass = (status: string): string =>
+    statusColor[status] || "bg-gray-100 text-gray-600";
+
+  useEffect(() => {
+    const refreshOrder = async () => {
+      if (!isModalOpen || !selectedOrder?.id) return;
+      try {
+        const refreshed = await fetchOrderById(selectedOrder.id);
+        if (refreshed) setSelectedOrder(refreshed);
+      } catch (err) {
+        console.error("❌ Failed to refresh order:", err);
+      }
+    };
+    refreshOrder();
+  }, [isModalOpen, selectedOrder?.id, fetchOrderById]);
 
   const handleEdit = async (order: Order) => {
+    if (!order.id) return;
     try {
-      const response = await axios.get(
-        `https://api-motoxelerate.onrender.com/api/order/${order.id}`
-      );
-      const formatted = formatOrder(response.data);
-      setSelectedOrder(formatted);
-      setIsModalOpen(true);
+      const refreshed = await fetchOrderById(order.id);
+      if (refreshed) {
+        setSelectedOrder(refreshed);
+        setIsModalOpen(true);
+      }
     } catch (err) {
-      console.error("❌ Failed to fetch full order:", err);
+      console.error("❌ Failed to fetch order:", err);
     }
   };
 
+  // ✅ Only show latest 6 unless expanded
+  const displayedOrders = expanded ? orders : orders.slice(0, 6);
+
+  const emptyMessage =
+    filter === "Delivered"
+      ? "There's no delivered order yet"
+      : filter === "Completed"
+      ? "There's no completed order yet"
+      : "No orders found";
+
   return (
-    <div className="bg-white p-6 rounded-md shadow-lg">
-      <div className="flex justify-between items-center mb-4">
-        <h2 className="text-2xl font-semibold">Recent Orders</h2>
-        <img
-          src="/images/icons/order-history.png"
-          alt="Recent Orders"
-          className="w-8"
+    <div className="max-h-[400px] overflow-y-auto scrollbar-hide">
+      {displayedOrders.length === 0 ? (
+        <p className="text-md text-gray-600 italic text-center py-6">
+          {emptyMessage}
+        </p>
+      ) : (
+        <>
+          {displayedOrders.map((order) => {
+            const status = getOrderStatus(order);
+            return (
+              <div
+                key={order.id}
+                className="grid grid-cols-[2fr_repeat(5,2fr)_1fr] items-center text-sm py-3 border-b border-gray-200 hover:bg-gray-50 transition"
+              >
+                <div className="font-semibold truncate">{order.id}</div>
+                <div className="px-2 font-medium truncate">{order.name}</div>
+                <div className="text-gray-700">{order.date}</div>
+                <div className="px-3 font-medium">{order.quantity}</div>
+                <div className="px-2 font-medium">{order.total}</div>
+                <div>
+                  <span
+                    className={`px-3 py-1 rounded-full text-xs font-semibold ${getStatusClass(
+                      status
+                    )}`}
+                  >
+                    {status}
+                  </span>
+                </div>
+                <div className="px-2 flex gap-3">
+                  <button
+                    onClick={() => onView(order)}
+                    className="text-blue-600 font-semibold hover:underline"
+                  >
+                    View
+                  </button>
+                  <button
+                    onClick={() => handleEdit(order)}
+                    className="text-red-600 font-semibold hover:underline"
+                  >
+                    Edit
+                  </button>
+                </div>
+              </div>
+            );
+          })}
+
+          {/* ✅ Show More / Show Less toggle */}
+          {orders.length > 6 && (
+            <div className="flex justify-center py-3">
+              <button
+                onClick={() => setExpanded(!expanded)}
+                className="text-sm text-blue-600 font-semibold hover:underline"
+              >
+                {expanded ? "Show Less" : "Show All Orders"}
+              </button>
+            </div>
+          )}
+        </>
+      )}
+
+      {selectedOrder && (
+        <RecentOrderModal
+          isOpen={isModalOpen}
+          onClose={() => setIsModalOpen(false)}
+          selectedOrder={selectedOrder}
+          setSelectedOrder={setSelectedOrder}
         />
-      </div>
-
-      <div className="flex flex-row flex-wrap gap-5 text-sm text-gray-600 font-medium mb-3">
-        <div className="w-[210px] ">Order ID</div>
-        <div className="w-[180px] ml-3 ">Name</div>
-        <div className="w-[110px] ">Date</div>
-        <div className="w-fit mr-5 ">Product Ordered</div>
-        <div className="w-[100px] ">Total</div>
-        <div className="w-[150px] ">Payment Method</div>
-        <div className="w-fit ">Actions</div>
-      </div>
-
-      {orders.map((order) => (
-        <div
-          key={order.id}
-          className="flex flex-row flex-wrap gap-6 text-sm pt-4"
-        >
-          <div className="w-[210px] ">
-            <p className="font-semibold truncate line-clamp-1">{order.id}</p>
-          </div>
-          <div className="w-[177px] ml-2 ">
-            <p className="font-semibold truncate line-clamp-1">{order.name}</p>
-          </div>
-          <div className="w-[105px] ">
-            <p className="font-semibold">{order.date}</p>
-          </div>
-          <div className="w-[120px] ">
-            <p className="font-semibold text-center">{order.quantity}</p>
-          </div>
-          <div className="w-[95px] ml-4 ">
-            <p className="font-semibold">{order.total}</p>
-          </div>
-          <div className="w-[145px] ">
-            <p className="font-semibold">{order.payment}</p>
-          </div>
-          <div className="w-fit flex flex-row gap-5">
-            <button
-              onClick={() => handleEdit(order)}
-              className="font-semibold text-blue-600 hover:underline"
-            >
-              View
-            </button>
-            <button
-              onClick={() => handleEdit(order)}
-              className="font-semibold text-red-600 hover:underline"
-            >
-              Edit
-            </button>
-          </div>
-        </div>
-      ))}
-
-      <RecentOrderModal
-        isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-        selectedOrder={selectedOrder}
-        setSelectedOrder={setSelectedOrder}
-      />
+      )}
     </div>
   );
 }

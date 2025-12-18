@@ -1,4 +1,4 @@
-import type { BackendProduct } from "../types";
+import type { BackendProduct } from "../../types";
 type ProductCardProps = {
   product: BackendProduct;
   onEdit: (product: BackendProduct) => void;

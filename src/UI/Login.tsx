@@ -26,18 +26,24 @@ function Login() {
   };
 
   return (
-    <div className="flex flex-row justify-center items-center h-screen">
-      <div className="w-[700px] px-28 py-10 justify-center bg-gray-800 rounded-xl shadow-xl">
+    <div className="bg-gray-800 flex justify-center items-center h-screen">
+      <div className="w-[500px] px-10 py-10 bg-gray-800 rounded-xl shadow-xl">
+        {/* Logo */}
         <img
-          src="/images/logo/Starter pfp.jpg"
+          src="/images/logo/motoxelerate.png"
           alt="Logo"
-          className="w-[70px] object-fill justify-center mx-auto mb-8"
+          className="w-[120px] object-fill bg-white rounded-full mx-auto mb-6"
         />
-        <h1 className="text-3xl text-white font-bold mb-1">Welcome to</h1>{" "}
-        <span className="text-3xl text-white font-bold">MotoXelerate</span>
-        <div className="flex flex-col gap-5 mt-15 px-14 mt-7">
-          <div className="flex flex-col">
-            <label className="text-md text-white font-semibold mb-3">
+
+        {/* Title */}
+        <h1 className="text-3xl text-white font-bold">
+          Welcome to <span className="block mt-1">MotoXelerate</span>
+        </h1>
+
+        {/* Form */}
+        <div className="flex flex-col gap-3 mt-8 px-8">
+          <div className="flex flex-col items-center w-full">
+            <label className="text-md text-white font-semibold self-start mb-2">
               Email
             </label>
             <input
@@ -45,11 +51,12 @@ function Login() {
               placeholder="Enter your admin email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="py-2 px-2 mx-6 border-gray-600 shadow-md rounded"
+              className="text-sm w-full py-2 px-3 bg-transparent border-b border-gray-500 text-white focus:outline-none focus:border-green-500"
             />
           </div>
-          <div className="flex flex-col">
-            <label className="text-md text-white font-semibold mb-3">
+
+          <div className="flex flex-col items-center w-full mt-4">
+            <label className="text-md text-white font-semibold self-start mb-2">
               Password
             </label>
             <input
@@ -57,23 +64,25 @@ function Login() {
               placeholder="Enter your password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="py-2 px-2 mx-6 border-gray-600 shadow-md rounded"
+              className="text-sm w-full py-2 px-3 bg-transparent border-b border-gray-500 text-white focus:outline-none focus:border-green-500"
             />
           </div>
-        </div>
-        <div className="flex flex-col justify-center items-center gap-4">
-          <button
-            onClick={handleLogin}
-            className="rounded bg-green-500 py-2 w-72 text-black hover:bg-green-600 mt-8 text-md font-semibold"
-          >
-            Login
-          </button>
-          <button
-            onClick={() => navigate("/forgot-password")}
-            className="text-red-600 cursor-pointer"
-          >
-            Forgot Password?
-          </button>
+
+          {/* Buttons */}
+          <div className="flex flex-col gap-4 mt-4">
+            <button
+              onClick={handleLogin}
+              className="rounded bg-green-500 py-2 w-full text-black hover:bg-green-600 text-md font-semibold"
+            >
+              Login
+            </button>
+            <button
+              onClick={() => navigate("/forgot-password")}
+              className="text-sm text-red-500 hover:text-red-600 cursor-pointer text-right"
+            >
+              Forgot Password?
+            </button>
+          </div>
         </div>
       </div>
     </div>

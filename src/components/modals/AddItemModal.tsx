@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import axios from "axios";
-import SaveBtn from "../SaveBtn";
+import Button from "../ActionBtn";
 
 type AddProductModalProps = {
   isOpen: boolean;
@@ -61,6 +61,7 @@ export default function AddItemModal({
       const formData = new FormData();
       formData.append("file", imageFile);
       formData.append("upload_preset", "MotoXelerate");
+      formData.append("folder", "products");
 
       const uploadRes = await axios.post(
         "https://api.cloudinary.com/v1_1/dhh37ekzf/image/upload",
@@ -210,7 +211,7 @@ export default function AddItemModal({
         </div>
 
         <div className="mt-6">
-          <SaveBtn icon="/images/icons/save.png" onPress={handleSubmit} />
+          <Button icon="/images/icons/save.png" onPress={handleSubmit} />
         </div>
       </div>
     </div>

@@ -1,26 +1,7 @@
 import { useEffect, useState } from "react";
-import SaveBtn from "../SaveBtn";
-import axios from "axios";
-
-type OrderItem = {
-  productId: string;
-  productName: string | null;
-  price: string | null;
-  quantity: number;
-  status: string;
-};
-
-type Order = {
-  id: string;
-  name: string;
-  date: string;
-  quantity: number;
-  total: string;
-  payment: string;
-  address: string;
-  status: string;
-  items: OrderItem[];
-};
+import { useOrders } from "../../../hooks/useOrders";
+import type { Order } from "../../../hooks/useOrders";
+import Button from "../ActionBtn";
 
 type ModalProps = {
   isOpen: boolean;
@@ -37,6 +18,25 @@ export default function RecentOrderModal({
 }: ModalProps) {
   const [mounted, setMounted] = useState(false);
   const [animateIn, setAnimateIn] = useState(false);
+  const [loading, setLoading] = useState(false);
+
+  const { fetchOrderById, updateOrderItems } = useOrders();
+
+  useEffect(() => {
+    const loadOrder = async () => {
+      if (!isOpen || !selectedOrder?.id) return;
+      setLoading(true);
+      try {
+        const refreshed = await fetchOrderById(selectedOrder.id);
+        if (refreshed) setSelectedOrder(refreshed);
+      } catch (err) {
+        console.error("❌ Failed to fetch order:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    loadOrder();
+  }, [isOpen, selectedOrder?.id, fetchOrderById, setSelectedOrder]);
 
   useEffect(() => {
     if (isOpen) {
@@ -51,182 +51,156 @@ export default function RecentOrderModal({
 
   if (!mounted) return null;
 
-  const formatOrder = (data: any): Order => ({
-    id: data.orderId || data._id,
-    name: data.customerName,
-    date: new Date(data.orderDate || data.createdAt).toLocaleDateString(),
-    quantity: data.items.reduce(
-      (sum: number, item: any) => sum + item.quantity,
-      0
-    ),
-    total: `₱${parseFloat(data.totalOrder).toLocaleString()}`,
-    payment: data.paymentMethod,
-    status: data.orderRequest || "N/A",
-    address: data.deliveryAddress || "No address provided",
-    items: data.items.map((item: any, index: number) => ({
-      productId: item.productId ?? `missing-${index}`,
-      productName: item.productName ?? null,
-      price:
-        item.price != null
-          ? `₱${parseFloat(item.price).toLocaleString()}`
-          : null,
-      quantity: item.quantity,
-      status: item.status,
-    })),
-  });
-
   const updateStatus = async () => {
-    if (!selectedOrder) return;
-
+    if (!selectedOrder?.id) return;
     try {
-      const payload = {
-        items: selectedOrder.items.map((item) => ({
-          productId: item.productId,
-          status: item.status,
-        })),
-      };
-
-      await axios.put(
-        `https://api-motoxelerate.onrender.com/api/order/${selectedOrder.id}`,
-        payload
+      const updated = await updateOrderItems(
+        selectedOrder.id,
+        selectedOrder.items
       );
-
-      const refreshed = await axios.get(
-        `https://api-motoxelerate.onrender.com/api/order/${selectedOrder.id}`
-      );
-
-      setSelectedOrder(formatOrder(refreshed.data));
-      console.log("✅ Product statuses updated and reloaded");
-      onClose();
+      if (updated) {
+        setSelectedOrder(updated);
+        console.log("✅ Product statuses updated and reloaded");
+        onClose();
+      }
     } catch (err) {
       console.error("❌ Failed to update product statuses:", err);
     }
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40 transition-opacity duration-300">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm transition-opacity duration-300">
       <div
-        className={`bg-white rounded-lg shadow-lg w-[1400px] h-fit px-8 py-10 pb-28 relative transform transition-all duration-300 ease-in-out ${
+        className={`bg-white rounded-xl shadow-2xl w-[1150px] max-h-[90vh] flex flex-col transform transition-all duration-300 ease-in-out ${
           animateIn ? "translate-y-0 opacity-100" : "translate-y-10 opacity-0"
         }`}
       >
-        <button
-          onClick={onClose}
-          className="absolute top-4 right-5 text-gray-500 hover:text-gray-800 text-xl"
-        >
-          <img src="/images/icons/close.png" alt="Close" className="w-4" />
-        </button>
+        {/* Header */}
+        <div className="flex justify-between items-center border-b border-gray-200 px-8 py-5">
+          <h2 className="text-xl font-semibold text-gray-800">
+            {selectedOrder ? `Order #${selectedOrder.id}` : "Order Details"}
+          </h2>
+          <button
+            onClick={onClose}
+            className="text-gray-400 hover:text-gray-700 transition"
+            aria-label="Close modal"
+          >
+            <img
+              src="/images/icons/close.png"
+              alt="Close"
+              className="w-5 h-5"
+            />
+          </button>
+        </div>
 
-        {selectedOrder && (
-          <div>
-            <h2 className="text-2xl font-semibold mb-5">{selectedOrder.id}</h2>
-
-            <div className="flex flex-row flex-wrap gap-5 text-sm text-gray-600 font-medium mb-3">
-              <div className="w-[180px]">Product ID</div>
-              <div className="w-[190px]">Product Name</div>
-              <div className="w-[160px]">Customer Name</div>
-              <div className="w-[88px]">Quantity</div>
-              <div className="w-[110px]">Price</div>
-              <div className="w-[150px]">Payment Method</div>
-              <div className="w-[190px]">Address</div>
-              <div className="w-fit">Status</div>
-            </div>
-
-            {selectedOrder.items.map((item, index) => {
-              const isFallback =
-                !item.productId ||
-                item.productName === null ||
-                item.price === null;
-
-              if (isFallback) {
-                console.warn(
-                  `⚠️ Order ${selectedOrder.id} Item[${index}] has fallback values:`,
-                  item
-                );
-              }
-
-              return (
-                <div
-                  key={`${item.productId}-${index}`}
-                  className="flex flex-row flex-wrap gap-4 text-sm pt-4 border-t border-gray-200"
-                >
-                  <div className="w-[180px]">
-                    <p className="font-semibold truncate">{item.productId}</p>
-                  </div>
-                  <div className="w-[195px]">
-                    <p className="font-semibold truncate">
-                      {item.productName ?? "Unnamed Product"}
-                    </p>
-                  </div>
-                  <div className="w-[170px] pl-1">
-                    <p className="font-semibold truncate line-clamp-1">
-                      {selectedOrder.name}
-                    </p>
-                  </div>
-                  <div className="w-[90px]">
-                    <p className="font-semibold">{item.quantity}</p>
-                  </div>
-                  <div className="w-[110px]">{item.price ?? "₱0"}</div>
-                  <div className="w-[150px]">
-                    <p className="font-semibold">{selectedOrder.payment}</p>
-                  </div>
-                  <div className="w-[200px] pl-1">
-                    <p className="font-semibold truncate">
-                      {selectedOrder.address}
-                    </p>
-                  </div>
-                  <div className="w-[120px]">
-                    <select
-                      value={item.status}
-                      onChange={async (e) => {
-                        const newStatus = e.target.value;
-
-                        const updatedItems = selectedOrder.items.map((itm, i) =>
-                          i === index ? { ...itm, status: newStatus } : itm
-                        );
-
-                        setSelectedOrder((prev) =>
-                          prev ? { ...prev, items: updatedItems } : prev
-                        );
-
-                        try {
-                          await axios.put(
-                            `https://api-motoxelerate.onrender.com/api/order/${selectedOrder.id}`,
-                            {
-                              items: updatedItems.map((itm) => ({
-                                productId: itm.productId,
-                                status: itm.status,
-                              })),
-                            }
-                          );
-
-                          const refreshed = await axios.get(
-                            `https://api-motoxelerate.onrender.com/api/order/${selectedOrder.id}`
-                          );
-
-                          setSelectedOrder(formatOrder(refreshed.data));
-                          console.log("✅ Status updated and refreshed");
-                        } catch (err) {
-                          console.error("❌ Failed to update status:", err);
-                        }
-                      }}
-                      className="text-[13px] font-medium text-black cursor-pointer bg-transparent border border-gray-500 rounded-md p-1"
-                    >
-                      <option value="For approval">For approval</option>
-                      <option value="To ship">To ship</option>
-                      <option value="Ship">Ship</option>
-                      <option value="Completed">Completed</option>
-                      <option value="Delivered">Delivered</option>
-                    </select>
-                  </div>
+        {/* Body */}
+        <div className="flex-1 overflow-y-auto px-8 py-6">
+          {loading ? (
+            <p className="text-center text-gray-500 text-sm">
+              Loading order details…
+            </p>
+          ) : selectedOrder ? (
+            <>
+              {/* Customer Info */}
+              <div className="grid grid-cols-2 gap-6 mb-6">
+                <div>
+                  <p className="text-gray-600 text-sm">Customer</p>
+                  <p className="font-medium">{selectedOrder.name}</p>
                 </div>
-              );
-            })}
-          </div>
-        )}
+                <div>
+                  <p className="text-gray-600 text-sm">Payment</p>
+                  <p className="font-medium">
+                    {selectedOrder.paymentMethod} ({selectedOrder.paymentStatus}
+                    )
+                  </p>
+                </div>
+                <div>
+                  <p className="text-gray-600 text-sm">Address</p>
+                  <p className="font-medium">
+                    {selectedOrder.address ?? "No address provided"}
+                  </p>
+                </div>
+                <div>
+                  <p className="text-gray-600 text-sm">Total</p>
+                  <p className="font-medium">{selectedOrder.total}</p>
+                </div>
+              </div>
 
-        <div className="absolute bottom-5 right-4">
-          <SaveBtn icon="/images/icons/save.png" onPress={updateStatus} />
+              {/* Items Table */}
+              <div className="border border-gray-200 rounded-lg overflow-hidden">
+                <div className="grid grid-cols-[3fr_3fr_1fr_1fr_2fr] bg-gray-200 text-md font-semibold text-gray-700 border-b border-gray-200">
+                  <div className="px-3 py-2">Product ID</div>
+                  <div className="px-3 py-2">Product Name</div>
+                  <div className="px-3 py-2 text-center">Qty</div>
+                  <div className="px-3 py-2">Price</div>
+                  <div className="px-3 py-2">Status</div>
+                </div>
+                <div className="max-h-[300px] overflow-y-auto">
+                  {selectedOrder.items.map((item, index) => (
+                    <div
+                      key={`${item.productId}-${index}`}
+                      className="grid grid-cols-[3fr_3fr_1fr_1fr_2fr] text-md border-b border-gray-100 hover:bg-gray-50 transition"
+                    >
+                      <div className="px-3 py-2 font-medium truncate">
+                        {item.productId}
+                      </div>
+                      <div className="px-3 py-2 truncate">
+                        {item.product_Name ?? "Unknown"}
+                      </div>
+                      <div className="px-3 py-2 text-center">
+                        {item.quantity}
+                      </div>
+                      <div className="px-3 py-2">
+                        {item.product_Price ?? "N/A"}
+                      </div>
+                      <div className="px-3 py-2">
+                        <select
+                          value={item.status}
+                          onChange={(e) => {
+                            const newStatus = e.target.value;
+                            const updatedItems = selectedOrder.items.map(
+                              (itm, i) =>
+                                i === index
+                                  ? { ...itm, status: newStatus }
+                                  : itm
+                            );
+                            setSelectedOrder((prev) =>
+                              prev ? { ...prev, items: updatedItems } : prev
+                            );
+                          }}
+                          className="text-sm font-medium text-gray-800 cursor-pointer bg-white border border-gray-300 rounded-md px-2 py-1 w-full focus:ring-2 focus:ring-green-500 focus:border-green-500 transition"
+                          aria-label="Update item status"
+                        >
+                          {item.status === "For Approval" && (
+                            <option value="For Approval" disabled>
+                              For Approval
+                            </option>
+                          )}
+                          <option value="To ship">To ship</option>
+                          <option value="Ship">Ship</option>
+                          <option value="Delivered">Delivered</option>
+                          <option value="Completed">Completed</option>
+                        </select>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </>
+          ) : (
+            <p className="text-center text-gray-500 text-sm">
+              No order selected.
+            </p>
+          )}
+        </div>
+
+        {/* Footer */}
+        <div className="border-t border-gray-200 px-8 py-4 flex justify-end bg-gray-50 rounded-b-xl">
+          <Button
+            icon="/images/icons/save.png"
+            onPress={updateStatus}
+            className="bg-green-600 hover:bg-green-700 text-white font-medium rounded-lg px-5 py-2 shadow-md transition"
+          />
         </div>
       </div>
     </div>

@@ -8,23 +8,23 @@ const navItems = [
   { label: "Orders", icon: "/images/panel-icons/order.png" },
   { label: "Products", icon: "/images/panel-icons/product.png" },
   { label: "Appointment", icon: "/images/panel-icons/reservations.png" },
+  { label: "Announcement", icon: "/images/panel-icons/announcement.png" },
   { label: "Customers", icon: "/images/panel-icons/customer.png" },
 ];
 
 const bottomItems = [
   { label: "Settings", icon: "/images/panel-icons/settings.png" },
-  { label: "Logout", icon: "/images/panel-icons/logout.png" },
 ];
 
 export default function Sidebar({ activeTab, setActiveTab }: SidebarProps) {
   return (
     <aside className="bg-gray-700 w-[285px] border-r border-gray-800 flex flex-col justify-between h-screen">
       <div>
-        <div className="flex items-center gap-3 py-8 px-6">
+        <div className="flex justify-center items-center gap-3 pt-6">
           <img
-            src="/images/logo/Starter pfp.jpg"
+            src="/images/logo/motoxelerate.png"
             alt="Logo"
-            className="w-[45px] h-[45px] object-cover rounded-full"
+            className="w-[60px] object-cover bg-white rounded-full"
           />
           <h1 className="text-2xl font-bold text-white">MotoXelerate</h1>
         </div>
@@ -56,8 +56,8 @@ export default function Sidebar({ activeTab, setActiveTab }: SidebarProps) {
           <div
             key={item.label}
             onClick={() => setActiveTab(item.label)}
-            className={`flex items-center gap-x-10 pl-5 px-4 py-3 rounded-md cursor-pointer transition-all duration-300 ${
-              activeTab === item.label ? "bg-sidebarbg" : "hover:bg-gray-600"
+            className={`text-white flex items-center gap-x-10 pl-5 px-4 py-3 rounded-md cursor-pointer transition-all duration-300 ${
+              activeTab === item.label ? "bg-gray-500" : "hover:bg-gray-600"
             }`}
           >
             <img
