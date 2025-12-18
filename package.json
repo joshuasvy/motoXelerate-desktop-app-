@@ -1,7 +1,7 @@
 {
   "name": "desktop-app-motoxelerate",
   "private": true,
-  "version": "0.0.0",
+  "version": "1.0.0",
   "main": "dist-electron/main.js",
   "scripts": {
     "start": "concurrently \"tsc -p tsconfig.node.json -w\" \"vite --port 5173 --strictPort\" \"wait-on http://localhost:5173 && electron .\"",
@@ -48,15 +48,16 @@
     "wait-on": "^9.0.1"
   },
   "build": {
-    "appId": "com.example.capstone",
-    "productName": "Capstone Desktop",
-    "files": [
-      "dist/**",
-      "dist-electron/**",
-      "package.json"
-    ],
-    "directories": {
-      "buildResources": "public"
+    "appId": "com.motoxelerate.desktop",
+    "productName": "MotoXelerate",
+    "win": {
+      "icon": "public/images/logo/motoxelerate.ico"
+    },
+    "mac": {
+      "icon": "public/images/logo/motoxelerate.icns"
+    },
+    "linux": {
+      "icon": "public/images/logo/motoxelerate.png"
     }
   }
 }
